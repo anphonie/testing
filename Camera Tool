@@ -5,7 +5,7 @@ import maya.cmds as cmds
 
 # creates an AlexaLF camera and sets the film back. Sets the Far Clip PLane to 10,000. Also setting the render settings to HD.
 def createCamera():
-    cameraName = cmds.camera(horizontalFilmAperture=1.247, verticalFilmAperture=0.702, farClipPlane=100000)
+    cameraName = cmds.camera(horizontalFilmAperture=1.247, verticalFilmAperture=0.702, farClipPlane=100000, depthOfField = True)
     setResolutionWidth = cmds.setAttr('defaultResolution.width', 1920)
     setResolutionHeight = cmds.setAttr('defaultResolution.height', 1080)
     setDeviceAspectRatio = cmds.setAttr('defaultResolution.deviceAspectRatio', 1.778)
@@ -42,6 +42,7 @@ def focalLength14():
         cam_shp = cmds.listRelatives(each_cam_tf,type="camera")
         if cam_shp:
             cmds.setAttr(cam_shp[0]+".fl", 14)
+            cmds.setAttr(cam_shp[0]+".fd", 7)
                         
 def focalLength16():
 
@@ -162,14 +163,14 @@ def cameraTools():
 
 
     cmds.separator(h=30)
-    cmds.text('LAYOUT: Sets AlexaLF Settings', align = "center")
+    cmds.text('LAYOUT: AlexaLF Settings', align = "center")
     cmds.separator(h=10)
     
     cmds.button(label = 'AlexaLF Settings', command = 'alexaCamera()', align = "center")
     
 
     cmds.separator(h=30)
-    cmds.text('Sets focal length on selected cameras', align = "center")
+    cmds.text('Focal Length', align = "center")
     cmds.separator(h=10)
     
     cmds.rowLayout(numberOfColumns = 16)
