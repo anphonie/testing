@@ -42,7 +42,6 @@ def focalLength14():
         cam_shp = cmds.listRelatives(each_cam_tf,type="camera")
         if cam_shp:
             cmds.setAttr(cam_shp[0]+".fl", 14)
-            cmds.setAttr(cam_shp[0]+".fd", 7)
                         
 def focalLength16():
 
@@ -142,7 +141,17 @@ def focalLength150():
         if cam_shp:
             cmds.setAttr(cam_shp[0]+".fl", 150)
 
+def slider(*args):
+    
+    for each_cam_tf in cmds.ls(sl=True):
+        cam_shp = cmds.listRelatives(each_cam_tf,type="camera")
+        if cam_shp:
+         values = cmds.intSliderGrp(slider123, query = True, value = True)
+         cmds.setAttr(cam_shp[0]+".fd", values)
 
+            
+
+    
 def cameraTools():
     
     if cmds.window('cameraTools', exists = True):
@@ -168,12 +177,18 @@ def cameraTools():
     
     cmds.button(label = 'AlexaLF Settings', command = 'alexaCamera()', align = "center")
     
+    cmds.separator(h=30)
+    cmds.text('Depth of Field Controls', align = "center")
+    cmds.separator(h=10)
 
+    cmds.intSliderGrp(field = True, label = 'Focal Distance', minValue = 1, maxValue = 1000, value = 10)
+    cmds.button(label = "Set", align = "center", command = 'slider()')
+    
     cmds.separator(h=30)
     cmds.text('Focal Length', align = "center")
     cmds.separator(h=10)
     
-    cmds.rowLayout(numberOfColumns = 16)
+    cmds.rowLayout(adjustableColumn = 5, numberOfColumns = 16)
     cmds.button(label = '12mm', align = "center", command = 'focalLength12()')
     cmds.button(label = '14mm', align = "center", command = 'focalLength14()')
     cmds.button(label = '16mm', align = "center", command = 'focalLength16()')
@@ -190,6 +205,9 @@ def cameraTools():
     cmds.button(label = '100mm', align = "center", command = 'focalLength100()')
     cmds.button(label = '135mm', align = "center", command = 'focalLength135()')
     cmds.button(label = '150mm', align = "center", command = 'focalLength150()')
+
+
+
     
     cmds.showWindow('cameraTools')
 
