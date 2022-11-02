@@ -10,7 +10,7 @@ def createCamera():
     setResolutionHeight = cmds.setAttr('defaultResolution.height', 1080)
     setDeviceAspectRatio = cmds.setAttr('defaultResolution.deviceAspectRatio', 1.778)
 
-
+    
 # Sets the camera Aperature made by the pipeline to match an AlexaLF camera. And sets the scene Render Settings to HD.
 def alexaCamera():
     for each_cam_tf in cmds.ls(sl=True):
@@ -141,13 +141,7 @@ def focalLength150():
         if cam_shp:
             cmds.setAttr(cam_shp[0]+".fl", 150)
 
-def slider(*args):
-    
-    for each_cam_tf in cmds.ls(sl=True):
-        cam_shp = cmds.listRelatives(each_cam_tf,type="camera")
-        if cam_shp:
-         values = cmds.intSliderGrp(slider123, query = True, value = True)
-         cmds.setAttr(cam_shp[0]+".fd", values)
+
 
             
 
@@ -181,7 +175,7 @@ def cameraTools():
     cmds.text('Depth of Field Controls', align = "center")
     cmds.separator(h=10)
 
-    cmds.intSliderGrp(field = True, label = 'Focal Distance', minValue = 1, maxValue = 1000, value = 10)
+    sliderINT = cmds.intSliderGrp(field = True, label = 'Focal Distance', minValue = 1, maxValue = 1000, value = 10)
     cmds.button(label = "Set", align = "center", command = 'slider()')
     
     cmds.separator(h=30)
@@ -211,6 +205,12 @@ def cameraTools():
     
     cmds.showWindow('cameraTools')
 
-
+def slider():
+    
+    for each_cam_tf in cmds.ls(sl=True):
+        cam_shp = cmds.listRelatives(each_cam_tf,type="camera")
+        if cam_shp:
+         values = cmds.intSliderGrp(sliderINT, query = True, value = True)
+         cmds.setAttr(cam_shp[0]+".fd", values)
     
 cameraTools()
