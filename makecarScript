@@ -1,0 +1,42 @@
+import maya.cmds as cmds
+import math
+from mtoa.core import createStandIn
+import pymel.core as pm
+import random
+
+
+selected = cmds.ls(sl=True,long=True) or []
+speedGroup = cmds.group(empty=True)
+betweenCarDistance = 20
+animTime=300
+carPaths = ["\\Users\\afong\\Downloads\\Assessment 3\\Timelapse car tool\\carAssets\\car01_v002.ass", "\\Users\\afong\\Downloads\\Assessment 3\\Timelapse car tool\\carAssets\\car02_v001.ass", "\\Users\\afong\\Downloads\\Assessment 3\\Timelapse car tool\\carAssets\\car03_v001.ass"]
+for eachSel in selected:
+   curve = cmds.listRelatives(eachSel,type="curveShape")
+   print(int(cmds.arclen(curve)))
+   if curve:
+      for i in range(1, int(cmds.arclen(curve)), betweenCarDistance):
+         print("Creating standin at " + str(i))
+         locator = cmds.spaceLocator()
+         standInShape = createStandIn()
+         standIn = cmds.listRelatives(standInShape, parent=True)
+         print(standIn)
+         standIn = cmds.rename(standIn[0], standIn[0]+"#")
+         standInShape = cmds.listRelatives(standIn, children=True)[0]
+         cmds.setAttr(standInShape+'.dso', carPaths[random.randint(0,2)], type="string")
+         cmds.parent(standIn, locator)
+         motionPath = cmds.pathAnimation(locator, curve, fractionMode=True, follow=True, inverseFront=True, followAxis="z", upAxis="y", worldUpVector=[0,1,0], startU=(i/cmds.arclen(curve)))
+         
+         cmds.addAttr(speedGroup, longName="speed_car"+str(int(i/betweenCarDistance)), at="float", minValue=0.0, maxValue=1.0)
+         cmds.connectAttr(speedGroup+".speed_car"+str(int(i/betweenCarDistance)), motionPath+".uValue", force=True)
+         cmds.setAttr(speedGroup+".speed_car"+str(int(i/betweenCarDistance)), i/cmds.arclen(curve))
+         print("Made speed attribute for " + "speed_car"+str(int(i/betweenCarDistance)))
+         cmds.currentTime(0)
+         cmds.setKeyframe(speedGroup, attribute="speed_car"+str(int(i/betweenCarDistance)), value=(i/cmds.arclen(curve)), inTangentType="linear", outTangentType="linear")
+         cmds.currentTime((1-(i/cmds.arclen(curve)))*animTime)
+         cmds.setKeyframe(speedGroup, attribute="speed_car"+str(int(i/betweenCarDistance)), value=1, inTangentType="linear", outTangentType="linear")
+         cmds.currentTime(((1-(i/cmds.arclen(curve)))*animTime)+1)
+         cmds.setKeyframe(speedGroup, attribute="speed_car"+str(int(i/betweenCarDistance)), value=0, inTangentType="linear", outTangentType="linear")
+         cmds.currentTime(animTime)
+         cmds.setKeyframe(speedGroup, attribute="speed_car"+str(int(i/betweenCarDistance)), value=(i/cmds.arclen(curve)), inTangentType="linear", outTangentType="linear")
+         cmds.currentTime(0)
+         #print(cmds.getAttr(curve[0]+".spans"))
