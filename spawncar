@@ -1,0 +1,71 @@
+import maya.cmds as cmds
+import math
+from mtoa.core import createStandIn
+import pymel.core as pm
+import random
+from maya.common.ui import LayoutManager
+
+
+selected = cmds.ls(sl=True,long=True) or []
+speedGroup = cmds.group(empty=True)
+betweenCarDistance = 20
+animTime=300
+carPaths = ["C:\\Users\\Anthony\\Documents\\assFiles\\car01_v002.ass", "C:\\Users\\Anthony\\Documents\\assFiles\\car02_v001.ass", "C:\\Users\\Anthony\\Documents\\assFiles\\car03_v001.ass"]
+
+
+def timelapseCars():
+    if cmds.window('timelapseCars', exists = True):
+        cmds.deleteUI('timelapseCars')
+        
+    cmds.window('timelapseCars', widthHeight = (300, 225), sizeable = False, resizeToFitChildren=True)
+    with LayoutManager(cmds.columnLayout(adj=True, rowSpacing=10)) as col:
+
+        cmds.columnLayout(adjustableColumn = True)
+    
+        cmds.separator(h=35)
+        cmds.text(label = "Traffic settings", align = "center", font = "boldLabelFont")
+        cmds.separator(h=10)
+
+        cmds.button(label = "Light Traffic", align = "center", command= "makeCars()")
+        cmds.button(label = "Moderate Traffic", align = "center", command= "makeCars()")
+        cmds.button(label = "Heavy Traffic", align = "center", command= "makeCars()")
+        cmds.separator(h=15)
+        
+        cmds.separator(h=25)
+        cmds.text(label = "Number of cars you would like to create:", align = "center")
+        cmds.separator(h=15)
+       
+        textbox1 = cmds.intField(minValue = 1, maxValue = 100)
+        cmds.button(label = "Create", align = "center", command= "makeCars()")
+        cmds.separator(h=10)
+    
+        cmds.showWindow('timelapseCars')
+
+def makeCars(*args):
+            curve = cmds.listRelatives(selected,type="curveShape")
+            locator = cmds.spaceLocator()
+            standInShape = createStandIn()
+            standIn = cmds.listRelatives(standInShape, parent=True)
+            print(standIn)
+            standIn = cmds.rename(standIn[0], standIn[0]+"#")
+            standInShape = cmds.listRelatives(standIn, children=True)[0]
+            cmds.setAttr(standInShape+'.dso', carPaths[random.randint(0,2)], type="string")
+            cmds.parent(standIn, locator)
+            motionPath = cmds.pathAnimation(locator, curve, fractionMode=True, follow=True, inverseFront=True, followAxis="z", upAxis="y", worldUpVector=[0,1,0], startU= 1)
+         
+            cmds.addAttr(speedGroup, longName="speed_car"+str(int(5/betweenCarDistance)), at="float", minValue=0.0, maxValue=1.0)
+            cmds.connectAttr(speedGroup+".speed_car"+str(int(5/betweenCarDistance)), motionPath+".uValue", force=True)
+            cmds.setAttr(speedGroup+".speed_car"+str(int(5/betweenCarDistance)), 5/cmds.arclen(curve))
+            print("Made speed attribute for " + "speed_car"+str(int(5/betweenCarDistance)))
+            cmds.currentTime(0)
+            cmds.setKeyframe(speedGroup, attribute="speed_car"+str(int(5/betweenCarDistance)), value=(5/cmds.arclen(curve)), inTangentType="linear", outTangentType="linear")
+            cmds.currentTime((1-(5/cmds.arclen(curve)))*animTime)
+            cmds.setKeyframe(speedGroup, attribute="speed_car"+str(int(5/betweenCarDistance)), value=1, inTangentType="linear", outTangentType="linear")
+            cmds.currentTime(((1-(5/cmds.arclen(curve)))*animTime)+1)
+            cmds.setKeyframe(speedGroup, attribute="speed_car"+str(int(5/betweenCarDistance)), value=0, inTangentType="linear", outTangentType="linear")
+            cmds.currentTime(animTime)
+            cmds.setKeyframe(speedGroup, attribute="speed_car"+str(int(5/betweenCarDistance)), value=(5/cmds.arclen(curve)), inTangentType="linear", outTangentType="linear")
+            cmds.currentTime(0)
+
+            print(cmds.getAttr(curve[0]+".spans"))
+timelapseCars()
