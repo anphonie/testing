@@ -2,7 +2,7 @@
 # This tool creates a camera based on a real lworld camera, and lets user set Arri Master Prime focal lengths.
 
 import maya.cmds as cmds
-
+global sliderINT
 # creates an AlexaLF camera and sets the film back. Sets the Far Clip PLane to 10,000. Also setting the render settings to HD.
 def createCamera():
     cameraName = cmds.camera(horizontalFilmAperture=1.247, verticalFilmAperture=0.702, farClipPlane=100000, depthOfField = True)
@@ -147,6 +147,7 @@ def focalLength150():
 
     
 def cameraTools():
+    global sliderINT
     
     if cmds.window('cameraTools', exists = True):
         cmds.deleteUI('cameraTools')
@@ -206,7 +207,7 @@ def cameraTools():
     cmds.showWindow('cameraTools')
 
 def slider():
-    
+    global sliderINT
     for each_cam_tf in cmds.ls(sl=True):
         cam_shp = cmds.listRelatives(each_cam_tf,type="camera")
         if cam_shp:
