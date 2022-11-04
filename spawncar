@@ -8,7 +8,6 @@ from maya.common.ui import LayoutManager
 
 selected = cmds.ls(sl=True,long=True) or []
 speedGroup = cmds.group(empty=True)
-betweenCarDistance = 20
 animTime=300
 carPaths = ["C:\\Users\\Anthony\\Documents\\assFiles\\car01_v002.ass", "C:\\Users\\Anthony\\Documents\\assFiles\\car02_v001.ass", "C:\\Users\\Anthony\\Documents\\assFiles\\car03_v001.ass"]
 
@@ -27,8 +26,8 @@ def timelapseCars():
         cmds.separator(h=10)
 
         cmds.button(label = "Light Traffic", align = "center", command= "makeCars()")
-        cmds.button(label = "Moderate Traffic", align = "center", command= "makeCars()")
-        cmds.button(label = "Heavy Traffic", align = "center", command= "makeCars()")
+        cmds.button(label = "Moderate Traffic", align = "center", command= "moderate()")
+        cmds.button(label = "Heavy Traffic", align = "center", command= "heavy()")
         cmds.separator(h=15)
         
         cmds.separator(h=25)
@@ -41,7 +40,117 @@ def timelapseCars():
     
         cmds.showWindow('timelapseCars')
 
+def light(*args):
+      betweenCarDistance = 600
+   #for eachSel in selected:
+      curve = cmds.listRelatives(selected, type="curveShape")
+      print(int(cmds.arclen(curve)))
+      for i in range(1, int(cmds.arclen(curve)), betweenCarDistance):
+            if i > 1699:
+               break
+            else:
+               print("Creating standin at " + str(i))
+               locator = cmds.spaceLocator()
+               standInShape = createStandIn()
+               standIn = cmds.listRelatives(standInShape, parent=True)
+               print(standIn)
+               standIn = cmds.rename(standIn[0], standIn[0]+"#")
+               standInShape = cmds.listRelatives(standIn, children=True)[0]
+               cmds.setAttr(standInShape+'.dso', carPaths[random.randint(0,2)], type="string")
+               cmds.parent(standIn, locator)
+               motionPath = cmds.pathAnimation(locator, curve, fractionMode=True, follow=True, inverseFront=True, followAxis="z", upAxis="y", worldUpVector=[0,1,0], startU=(i/cmds.arclen(curve)))
+         
+               cmds.addAttr(speedGroup, longName="speed_car"+str(int(i/betweenCarDistance)), at="float", minValue=0.0, maxValue=1.0)
+               cmds.connectAttr(speedGroup+".speed_car"+str(int(i/betweenCarDistance)), motionPath+".uValue", force=True)
+               cmds.setAttr(speedGroup+".speed_car"+str(int(i/betweenCarDistance)), i/cmds.arclen(curve))
+               print("Made speed attribute for " + "speed_car"+str(int(i/betweenCarDistance)))
+               cmds.currentTime(0)
+               cmds.setKeyframe(speedGroup, attribute="speed_car"+str(int(i/betweenCarDistance)), value=(i/cmds.arclen(curve)), inTangentType="linear", outTangentType="linear")
+               cmds.currentTime((1-(i/cmds.arclen(curve)))*animTime)
+               cmds.setKeyframe(speedGroup, attribute="speed_car"+str(int(i/betweenCarDistance)), value=1, inTangentType="linear", outTangentType="linear")
+               cmds.currentTime(((1-(i/cmds.arclen(curve)))*animTime)+1)
+               cmds.setKeyframe(speedGroup, attribute="speed_car"+str(int(i/betweenCarDistance)), value=0, inTangentType="linear", outTangentType="linear")
+               cmds.currentTime(animTime)
+               cmds.setKeyframe(speedGroup, attribute="speed_car"+str(int(i/betweenCarDistance)), value=(i/cmds.arclen(curve)), inTangentType="linear", outTangentType="linear")
+               cmds.currentTime(0)
+         #print(cmds.getAttr(curve[0]+".spans"))
+         
+         
+def moderate(*args):
+      betweenCarDistance = 600
+   #for eachSel in selected:
+      curve = cmds.listRelatives(selected, type="curveShape")
+      print(int(cmds.arclen(curve)))
+      for i in range(1, int(cmds.arclen(curve)), betweenCarDistance):
+            if i > 1700:
+               break
+            else:
+               print("Creating standin at " + str(i))
+               locator = cmds.spaceLocator()
+               standInShape = createStandIn()
+               standIn = cmds.listRelatives(standInShape, parent=True)
+               print(standIn)
+               standIn = cmds.rename(standIn[0], standIn[0]+"#")
+               standInShape = cmds.listRelatives(standIn, children=True)[0]
+               cmds.setAttr(standInShape+'.dso', carPaths[random.randint(0,2)], type="string")
+               cmds.parent(standIn, locator)
+               motionPath = cmds.pathAnimation(locator, curve, fractionMode=True, follow=True, inverseFront=True, followAxis="z", upAxis="y", worldUpVector=[0,1,0], startU=(i/cmds.arclen(curve)))
+         
+               cmds.addAttr(speedGroup, longName="speed_car"+str(int(i/betweenCarDistance)), at="float", minValue=0.0, maxValue=1.0)
+               cmds.connectAttr(speedGroup+".speed_car"+str(int(i/betweenCarDistance)), motionPath+".uValue", force=True)
+               cmds.setAttr(speedGroup+".speed_car"+str(int(i/betweenCarDistance)), i/cmds.arclen(curve))
+               print("Made speed attribute for " + "speed_car"+str(int(i/betweenCarDistance)))
+               cmds.currentTime(0)
+               cmds.setKeyframe(speedGroup, attribute="speed_car"+str(int(i/betweenCarDistance)), value=(i/cmds.arclen(curve)), inTangentType="linear", outTangentType="linear")
+               cmds.currentTime((1-(i/cmds.arclen(curve)))*animTime)
+               cmds.setKeyframe(speedGroup, attribute="speed_car"+str(int(i/betweenCarDistance)), value=1, inTangentType="linear", outTangentType="linear")
+               cmds.currentTime(((1-(i/cmds.arclen(curve)))*animTime)+1)
+               cmds.setKeyframe(speedGroup, attribute="speed_car"+str(int(i/betweenCarDistance)), value=0, inTangentType="linear", outTangentType="linear")
+               cmds.currentTime(animTime)
+               cmds.setKeyframe(speedGroup, attribute="speed_car"+str(int(i/betweenCarDistance)), value=(i/cmds.arclen(curve)), inTangentType="linear", outTangentType="linear")
+               cmds.currentTime(0)
+         #print(cmds.getAttr(curve[0]+".spans"))
+         
+         
+def heavy(*args):
+      betweenCarDistance = 600
+   #for eachSel in selected:
+      curve = cmds.listRelatives(selected, type="curveShape")
+      print(int(cmds.arclen(curve)))
+      for i in range(1, int(cmds.arclen(curve)), betweenCarDistance):
+            if i > 2100:
+               break
+            else:
+               print("Creating standin at " + str(i))
+               locator = cmds.spaceLocator()
+               standInShape = createStandIn()
+               standIn = cmds.listRelatives(standInShape, parent=True)
+               print(standIn)
+               standIn = cmds.rename(standIn[0], standIn[0]+"#")
+               standInShape = cmds.listRelatives(standIn, children=True)[0]
+               cmds.setAttr(standInShape+'.dso', carPaths[random.randint(0,2)], type="string")
+               cmds.parent(standIn, locator)
+               motionPath = cmds.pathAnimation(locator, curve, fractionMode=True, follow=True, inverseFront=True, followAxis="z", upAxis="y", worldUpVector=[0,1,0], startU=(i/cmds.arclen(curve)))
+         
+               cmds.addAttr(speedGroup, longName="speed_car"+str(int(i/betweenCarDistance)), at="float", minValue=0.0, maxValue=1.0)
+               cmds.connectAttr(speedGroup+".speed_car"+str(int(i/betweenCarDistance)), motionPath+".uValue", force=True)
+               cmds.setAttr(speedGroup+".speed_car"+str(int(i/betweenCarDistance)), i/cmds.arclen(curve))
+               print("Made speed attribute for " + "speed_car"+str(int(i/betweenCarDistance)))
+               cmds.currentTime(0)
+               cmds.setKeyframe(speedGroup, attribute="speed_car"+str(int(i/betweenCarDistance)), value=(i/cmds.arclen(curve)), inTangentType="linear", outTangentType="linear")
+               cmds.currentTime((1-(i/cmds.arclen(curve)))*animTime)
+               cmds.setKeyframe(speedGroup, attribute="speed_car"+str(int(i/betweenCarDistance)), value=1, inTangentType="linear", outTangentType="linear")
+               cmds.currentTime(((1-(i/cmds.arclen(curve)))*animTime)+1)
+               cmds.setKeyframe(speedGroup, attribute="speed_car"+str(int(i/betweenCarDistance)), value=0, inTangentType="linear", outTangentType="linear")
+               cmds.currentTime(animTime)
+               cmds.setKeyframe(speedGroup, attribute="speed_car"+str(int(i/betweenCarDistance)), value=(i/cmds.arclen(curve)), inTangentType="linear", outTangentType="linear")
+               cmds.currentTime(0)
+         #print(cmds.getAttr(curve[0]+".spans"))
+
+
+
 def makeCars(*args):
+            betweenCarDistance = 100
             curve = cmds.listRelatives(selected,type="curveShape")
             locator = cmds.spaceLocator()
             standInShape = createStandIn()
